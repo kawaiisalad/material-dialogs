@@ -45,13 +45,14 @@ typealias DateTimeCallback = ((dialog: MaterialDialog, datetime: Calendar) -> Un
  * Makes the dialog a date and time picker.
  */
 fun MaterialDialog.dateTimePicker(
-  minDateTime: Calendar? = null,
-  maxDateTime: Calendar? = null,
-  currentDateTime: Calendar? = null,
-  requireFutureDateTime: Boolean = false,
-  show24HoursView: Boolean = false,
-  autoFlipToTime: Boolean = true,
-  dateTimeCallback: DateTimeCallback = null
+    minDateTime: Calendar? = null,
+    maxDateTime: Calendar? = null,
+    currentDateTime: Calendar? = null,
+    requireFutureDateTime: Boolean = false,
+    show24HoursView: Boolean = false,
+    autoFlipToTime: Boolean = true,
+    alwaysFlipToTime: Boolean = false,
+    dateTimeCallback: DateTimeCallback = null
 ): MaterialDialog {
   customView(
       R.layout.md_datetime_picker_pager,
@@ -76,7 +77,7 @@ fun MaterialDialog.dateTimePicker(
       setActionButtonEnabled(
           POSITIVE, !requireFutureDateTime || futureTime
       )
-      if (autoFlipToTime && didDateChange(previous, date)) {
+      if (autoFlipToTime && alwaysFlipToTime || didDateChange(previous, date)) {
         getPager().currentItem = 1
       }
     }
@@ -84,9 +85,8 @@ fun MaterialDialog.dateTimePicker(
 
   getTimePicker().apply {
     setIs24HourView(show24HoursView)
-    hour(currentDateTime?.get(Calendar.HOUR_OF_DAY) ?: 12)
-    minute(currentDateTime?.get(Calendar.MINUTE) ?: 0)
-
+      hour(currentDateTime?.get(Calendar.HOUR_OF_DAY) ?: 12)
+      minute(currentDateTime?.get(Calendar.MINUTE) ?: 0)
     setOnTimeChangedListener { _, _, _ ->
       val isFutureTime = isFutureTime(getDatePicker(), this)
       setActionButtonEnabled(
